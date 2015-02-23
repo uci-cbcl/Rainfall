@@ -25,6 +25,8 @@ Xte = [X1te X2te];
 %       validation error
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
 
+maxTreeDepth=5;
+
 %number of ensembles
 N = 200;
 
@@ -41,7 +43,7 @@ curY = 0;
 for k=1:N,
  
  grad = 2*(curY - Ytrain);
- dt{k} = treeRegress(Xtrain,grad,'maxDepth',3);
+ dt{k} = treeRegress(Xtrain,grad,'maxDepth',maxTreeDepth);
  curY = curY - alpha(k) * predict(dt{k}, Xtrain);
  
  %find training MSE at k
@@ -54,6 +56,7 @@ for k=1:N,
 end;
 
 %%
+%{
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
@@ -61,6 +64,7 @@ xlabel('Number of Learners in Ensemble');
 ylabel('Mean Squared Error');
 legend('Training Error','Validation Error');
 title('MSE versus Number of Learners for Gradient Boosting');
+%}
 %%
 
 %train on all the test data
@@ -72,7 +76,7 @@ for k=1:N,
  
  %train the k-th decision tree
  grad = 2*(curY - Ytr);
- dt{k} = treeRegress(Xtr,grad,'maxDepth',3);
+ dt{k} = treeRegress(Xtr,grad,'maxDepth',maxTreeDepth);
  curY = curY - alpha(k) * predict(dt{k}, Xtr);
  
  %boost current prediction using that k-th decision tree
