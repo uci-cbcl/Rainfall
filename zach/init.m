@@ -14,6 +14,15 @@ save('kaggleData.mat','X1te','Ytr','X1tr','X2tr','X2te');
 load('kaggleData.mat');
 
 %%
+
+Xtr = [X1tr X2tr];
+Xte = [X1te X2te];
+
+%%
+
+
+%NOTE: cross-validation did not make a difference with training and
+%       validation error
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
 
 %number of ensembles
