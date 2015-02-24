@@ -19,7 +19,19 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.cross_validation import train_test_split
 import pylearn2
+import pylearn2.monitor
+import pylearn2.train
+import pylearn2.models.mlp
+import pylearn2.training_algorithms.sgd
+import pylearn2.termination_criteria
+import pylearn2.train_extensions.best_params
+import pylearn2.costs.cost
+import pylearn2.costs.mlp
+import pylearn2.cross_validation.subset_iterators
+import pylearn2.costs.mlp.dropout
+import pylearn2.utils.serial
 from pylearn2.datasets.dense_design_matrix import DenseDesignMatrix
+from theano import function
 
 def predict(x, model):
     X = model.get_input_space().make_theano_batch()
@@ -44,7 +56,10 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
     for l in xrange(num_hidden_layers):
         layers.append(hidden_layer(layer_name='h'+str(l), dim=num_hidden_nodes_per_layer,
         istdev=stdev))
+
     layers.append(pylearn2.models.mlp.Linear(layer_name='y', dim=1, istdev=stdev))
+
+    print layers
     
     model = pylearn2.models.mlp.MLP(layers=layers, nvis=num_features)
     
@@ -59,13 +74,13 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
     
     algorithm = pylearn2.training_algorithms.sgd.SGD(batch_size=minibatch_size, 
         learning_rate=learning_rate,
-        monitoring_dataset={'train':dataset_tr, 'valid':dataset_va},
+        monitoring_dataset={'train':dataset_tr, 'valid':dataset_va, 'test':dataset_va},
         cost=cost,
         termination_criterion=pylearn2.termination_criteria.And(
         criteria=criteria))
 
     extensions = [pylearn2.train_extensions.best_params.MonitorBasedSaveBest(
-        channel_name='train_objective',
+        channel_name='valid_objective',
         save_path=output_dir+ "NNModel_best.pkl")]
 
     trainer = pylearn2.train.Train(dataset=dataset_tr, model=model,
@@ -82,13 +97,13 @@ def scale_data(Xtr, Xte):
     return s
 
 def load_data(input_dir, useX1andX2):
-    input_dir = indput_dir + "/"
-    Xtr = numpy.loadtxt('kaggle.X1.train.txt',delimiter=',')    
-    Xte = numpy.loadtxt('kaggle.X1.test.txt',delimiter=',')
-    Ytr = numpy.loadtxt('kaggle.Y.train.txt')    
+    input_dir = input_dir + "/"
+    Xtr = np.loadtxt(input_dir + 'kaggle.X1.train.txt.gz',delimiter=',',dtype='float32')    
+    Xte = np.loadtxt(input_dir + 'kaggle.X1.test.txt.gz',delimiter=',',dtype='float32')
+    Ytr = np.loadtxt(input_dir + 'kaggle.Y.train.txt.gz',dtype='float32')    
     if useX1andX2:
-        X2tr = numpy.loadtxt('kaggle.X2.train.txt',delimiter=',')
-        X2te = numpy.loadtxt('kaggle.X2.test.txt',delimiter=',')
+        X2tr = np.loadtxt(input_dir + 'kaggle.X2.train.txt.gz',delimiter=',',dtype='float32')
+        X2te = np.loadtxt(input_dir + 'kaggle.X2.test.txt.gz',delimiter=',',dtype='float32')
         Xtr = np.concatenate((Xtr, X2tr), axis=1)
         Xte = np.concatenate((Xte, X2te), axis=1)    
     return Xtr, Ytr, Xte
@@ -99,13 +114,15 @@ def train(input_dir, output_dir, activation_function, num_hidden_layers,
     
     np.random.seed(random_seed)
 
+    print 'Loading data'
     Xtr, Ytr, Xte = load_data(input_dir, useX1andX2)
+    print 'Scaling data'
     s = scale_data(Xtr, Xte)
 
     Xtr, Xva, Ytr, Yva = train_test_split(Xtr, Ytr, test_size=valid_size)
-
-    dataset_tr = DenseDesignMatrix(X=Xtr,y=Ytr)
-    dataset_va = DenseDesignMatrix(X=Xva,y=Yva)
+    
+    dataset_tr = DenseDesignMatrix(X=Xtr,y=Ytr.reshape(len(Ytr),1))
+    dataset_va = DenseDesignMatrix(X=Xva,y=Yva.reshape(len(Yva),1))
 
     _, num_features = Xtr.shape
 
@@ -115,14 +132,23 @@ def train(input_dir, output_dir, activation_function, num_hidden_layers,
         stdev, dropout, gaussian)
     trainer.main_loop()
 
-    Ytr_pred = predict(Xtr, model)
-    Yva_pred = predict(Xva, model)
-    Yte_pred = predict(Xte, model)
+    best_model = pylearn2.utils.serial.load(output_dir+ "/NNModel_best.pkl")
 
+    Ytr_pred = predict(Xtr, best_model)
+    Yva_pred = predict(Xva, best_model)
+    Yte_pred = predict(Xte, best_model)
+
+    J_tr = mean_squared_error(Ytr_pred[:,0], Ytr)
+    J_va = mean_squared_error(Yva_pred[:,0], Yva)
+    
+    print "Training MSE:", J_tr
+    print "Validation MSE:", J_va
+
+    print "Outputting predictions on test set"
     test_predictions_file = open(output_dir + "/predictions.csv", "w")
     test_predictions_file.write('ID,Prediction\n')
-    for i in xrange(length(Yte_pred)):
-        test_predictions_file.write(str(i+1) + "," + str(Yte_pred[i]) + "\n")
+    for i in xrange(len(Yte_pred)):
+        test_predictions_file.write(str(i+1) + "," + str(max(0,Yte_pred[i,0])) + "\n")
     test_predictions_file.close()
 
 def make_argument_parser():
@@ -164,13 +190,13 @@ def make_argument_parser():
     parser.add_argument('--dropout', '-d', action='store_true',
     help='If specified, use dropout.')
 
-    parser.add_argument('--learningrate', '-l', type=float, default=0.01,
+    parser.add_argument('--learningrate', '-e', type=float, default=0.01,
     help='Learning rate (default: 0.01).')
 
     parser.add_argument('--randomseed', '-r', type=int, default=0,
     help='Random seed (default: 0).')
 
-    parser.add_argument('--stddev', '-s', type=float, default=0.01,
+    parser.add_argument('--stdev', '-s', type=float, default=0.01,
     help='Random seed (default: 0.01).')
 
     parser.add_argument('--validsize', '-v', type=float, default=0.1,
@@ -207,6 +233,6 @@ if __name__ == "__main__":
                 print >> sys.stderr, ("output directory (%s) already exists "
                 "so it will be clobbered") % (output_dir);
 
-    train(args.inputdir, args.outputdir, args.activationfunction, args.numhiddenlayers, 
+    train(args.inputdir, output_dir, args.activation, args.numhiddenlayers, 
         args.numhiddennodesperlayer, args.learningrate, args.minibatchsize, args.stdev, 
         args.dropout, args.useX1andX2, args.gaussian, args.validsize, args.randomseed)
