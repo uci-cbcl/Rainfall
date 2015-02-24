@@ -15,8 +15,17 @@ load('kaggleData.mat');
 
 %%
 
-Xtr = [X1tr X2tr];
-Xte = [X1te X2te];
+%add features to X1 which are the mean and std of the X2 patches
+meanX2tr = mean(X2tr,2);
+stdX2tr = std(X2tr,0,2);
+meanX2te = mean(X2te,2);
+stdX2te = std(X2te,0,2);
+
+Xtr = [X1tr meanX2tr stdX2tr];
+Xte = [X1te meanX2te stdX2te];
+
+%Xtr = [X1tr X2tr];
+%Xte = [X1te X2te];
 
 %%
 
@@ -28,7 +37,7 @@ Xte = [X1te X2te];
 maxTreeDepth=3;
 
 %number of ensembles
-N = 100;
+N = 200;
 
 mseTraining = zeros(1,N);
 mseValidation = zeros(1,N);
@@ -55,7 +64,6 @@ for k=1:N,
  
 end;
 
-%%
 
 plot(mseTraining,'r-');
 hold on
@@ -84,7 +92,6 @@ for k=1:N,
  
 end;
 
-%%
 fh = fopen('kagglePrediction.csv','w');  % open file for upload
 fprintf(fh,'ID,Prediction\n');      % output header line
 for i=1:length(predictY),
