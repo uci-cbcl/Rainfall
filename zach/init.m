@@ -49,20 +49,7 @@ title('MSE versus Number of Learners for Gradient Boosting');
 %%
 
 %train on all the test data
+[~,mseTraining,mseValidation] = ...
+    doGradientBoosting(Xtr,Xte,Ytr,0,100);
 
-N=100; %new number of ensembles
-curY=0;
-predictY=0;
-for k=1:N,
- 
- %train the k-th decision tree
- grad = 2*(curY - Ytr);
- dt{k} = treeRegress(Xtr,grad,'maxDepth',maxTreeDepth);
- curY = curY - alpha(k) * predict(dt{k}, Xtr);
- 
- %boost current prediction using that k-th decision tree
- predictY = predictY - alpha(k)*predict(dt{k}, Xte);
- 
-end;
-%%
 makeKagglePrediction(predictY);
