@@ -91,10 +91,5 @@ for k=1:N,
  predictY = predictY - alpha(k)*predict(dt{k}, Xte);
  
 end;
-
-fh = fopen('kagglePrediction.csv','w');  % open file for upload
-fprintf(fh,'ID,Prediction\n');      % output header line
-for i=1:length(predictY),
-    fprintf(fh,'%d,%d\n',i,predictY(i));  % output each prediction
-end;
-fclose(fh);                         % close the file
+%%
+makeKagglePrediction(predictY);
