@@ -25,10 +25,10 @@ Xte = [X1te X2te];
 %       validation error
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
 
-maxTreeDepth=5;
+maxTreeDepth=3;
 
 %number of ensembles
-N = 200;
+N = 100;
 
 mseTraining = zeros(1,N);
 mseValidation = zeros(1,N);
@@ -56,7 +56,7 @@ for k=1:N,
 end;
 
 %%
-%{
+
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
@@ -64,7 +64,7 @@ xlabel('Number of Learners in Ensemble');
 ylabel('Mean Squared Error');
 legend('Training Error','Validation Error');
 title('MSE versus Number of Learners for Gradient Boosting');
-%}
+
 %%
 
 %train on all the test data
