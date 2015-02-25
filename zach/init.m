@@ -15,8 +15,17 @@ load('kaggleData.mat');
 
 %%
 
-Xtr = [X1tr X2tr];
-Xte = [X1te X2te];
+%add features to X1 which are the mean and std of the X2 patches
+meanX2tr = mean(X2tr,2);
+stdX2tr = std(X2tr,0,2);
+meanX2te = mean(X2te,2);
+stdX2te = std(X2te,0,2);
+
+Xtr = [X1tr meanX2tr stdX2tr];
+Xte = [X1te meanX2te stdX2te];
+
+%Xtr = [X1tr X2tr];
+%Xte = [X1te X2te];
 
 %%
 
@@ -25,38 +34,10 @@ Xte = [X1te X2te];
 %       validation error
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
 
-maxTreeDepth=5;
+[~,mseTraining,mseValidation] = ...
+    doGradientBoosting(Xtrain,Xvalid,Ytrain,Yvalid,150);
 
-%number of ensembles
-N = 200;
 
-mseTraining = zeros(1,N);
-mseValidation = zeros(1,N);
-
-%alpha values
-alpha = 0.25*ones(1,N);
-dt = cell(1,N);
-
-predictY = 0;
-curY = 0;
-
-for k=1:N,
- 
- grad = 2*(curY - Ytrain);
- dt{k} = treeRegress(Xtrain,grad,'maxDepth',maxTreeDepth);
- curY = curY - alpha(k) * predict(dt{k}, Xtrain);
- 
- %find training MSE at k
- mseTraining(k) = mean((curY-Ytrain).^2);
- 
- %find validation MSE
- predictY = predictY - alpha(k)*predict(dt{k}, Xvalid);
- mseValidation(k) = mean((Yvalid-predictY).^2);
- 
-end;
-
-%%
-%{
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
@@ -64,30 +45,11 @@ xlabel('Number of Learners in Ensemble');
 ylabel('Mean Squared Error');
 legend('Training Error','Validation Error');
 title('MSE versus Number of Learners for Gradient Boosting');
-%}
+
 %%
 
 %train on all the test data
+[~,mseTraining,mseValidation] = ...
+    doGradientBoosting(Xtr,Xte,Ytr,0,100);
 
-N=100; %new number of ensembles
-curY=0;
-predictY=0;
-for k=1:N,
- 
- %train the k-th decision tree
- grad = 2*(curY - Ytr);
- dt{k} = treeRegress(Xtr,grad,'maxDepth',maxTreeDepth);
- curY = curY - alpha(k) * predict(dt{k}, Xtr);
- 
- %boost current prediction using that k-th decision tree
- predictY = predictY - alpha(k)*predict(dt{k}, Xte);
- 
-end;
-
-%%
-fh = fopen('kagglePrediction.csv','w');  % open file for upload
-fprintf(fh,'ID,Prediction\n');      % output header line
-for i=1:length(predictY),
-    fprintf(fh,'%d,%d\n',i,predictY(i));  % output each prediction
-end;
-fclose(fh);                         % close the file
+makeKagglePrediction(predictY);
