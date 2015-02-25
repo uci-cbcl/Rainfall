@@ -59,25 +59,26 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
 
     layers.append(pylearn2.models.mlp.Linear(layer_name='y', dim=1, istdev=stdev))
 
-    print layers
+    num_layers = len(layers)
     
     model = pylearn2.models.mlp.MLP(layers=layers, nvis=num_features)
     
     costFunction = pylearn2.costs.mlp.Default()
     if dropout:
         costFunction = pylearn2.costs.mlp.dropout.Dropout()
+
     cost = pylearn2.costs.cost.SumOfCosts(costs=[costFunction])
 
-    criteria = [pylearn2.termination_criteria.MonitorBased(channel_name="train_objective",
+    criteria = [pylearn2.termination_criteria.MonitorBased(channel_name="valid_objective",
         prop_decrease=0., N=10),
         pylearn2.termination_criteria.EpochCounter(max_epochs=10000)]
     
     algorithm = pylearn2.training_algorithms.sgd.SGD(batch_size=minibatch_size, 
         learning_rate=learning_rate,
-        monitoring_dataset={'train':dataset_tr, 'valid':dataset_va, 'test':dataset_va},
+        monitoring_dataset={'train':dataset_tr, 'valid':dataset_va},
         cost=cost,
         termination_criterion=pylearn2.termination_criteria.And(
-        criteria=criteria))
+            criteria=criteria))
 
     extensions = [pylearn2.train_extensions.best_params.MonitorBasedSaveBest(
         channel_name='valid_objective',
