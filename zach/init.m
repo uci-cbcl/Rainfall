@@ -87,7 +87,7 @@ for k=1:N,
  curY = predict(dt{k}, Xtr);
 
  %find validation MSE
- prediction(:,k) = predict(dt{k}, Xvalid);
+ prediction(:,k) = predict(dt{k}, Xte);
  
 end;
 
