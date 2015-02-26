@@ -39,7 +39,7 @@ Xte = X1te;
 [numData,numFeatures] = size(Xtrain);
 [numTestData,numFeats] = size(Xvalid);
 
-N = 10;
+N = 40;
 dt = cell(1,N);
 mseTraining = zeros(1,N);
 mseValidation = zeros(1,N);
@@ -77,8 +77,10 @@ title('MSE versus Number of Learners for Gradient Boosting');
 %%
 
 %now learn on rest of data
+N = 35;
 dt = cell(1,N);
 curY = 0;
+[numTestData,numFeats] = size(Xte);
 prediction = zeros(numTestData,N);
 
 for k=1:N,
