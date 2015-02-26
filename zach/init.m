@@ -29,7 +29,54 @@ Xte = [X1te meanX2te stdX2te];
 
 %%
 
+Xtr = X1tr;
+Xte = X1te;
 
+%NOTE: cross-validation did not make a difference with training and
+%       validation error
+[Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
+
+[numData,numFeatures] = size(Xtrain);
+[numTestData,numFeats] = size(Xvalid);
+
+N = 10;
+dt = cell(1,N);
+mseTraining = zeros(1,N);
+mseValidation = zeros(1,N);
+
+predictY = 0;
+curY = 0;
+prediction = zeros(numTestData,N);
+
+numRandFeatures = 50;
+
+for k=1:N,
+ 
+ [xb,yb] = bootstrapData(Xtr,Ytr,numData);
+ dt{k} = treeRegress(xb,yb,'maxDepth',15,'minParent',8,'nFeatures',numRandFeatures);
+ curY = predict(dt{k}, xb);
+ 
+ %find training MSE at k
+ mseTraining(k) = mean((curY-yb).^2);
+ 
+ %find validation MSE
+ prediction(:,k) = predict(dt{k}, Xvalid);
+ predictY = mean(prediction(:,1:k),2);
+ 
+ mseValidation(k) = mean((Yvalid-predictY).^2);
+ 
+end;
+
+plot(mseTraining,'r-');
+hold on
+plot(mseValidation,'g--');
+xlabel('Number of Learners in Ensemble');
+ylabel('Mean Squared Error');
+legend('Training Error','Validation Error');
+title('MSE versus Number of Learners for Gradient Boosting');
+
+
+%%
 %NOTE: cross-validation did not make a difference with training and
 %       validation error
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
