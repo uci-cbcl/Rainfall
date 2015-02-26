@@ -47,7 +47,6 @@ mseValidation = zeros(1,N);
 predictY = 0;
 curY = 0;
 prediction = zeros(numTestData,N);
-
 numRandFeatures = 50;
 
 for k=1:N,
@@ -75,6 +74,25 @@ ylabel('Mean Squared Error');
 legend('Training Error','Validation Error');
 title('MSE versus Number of Learners for Gradient Boosting');
 
+%%
+
+%now learn on rest of data
+dt = cell(1,N);
+curY = 0;
+prediction = zeros(numTestData,N);
+
+for k=1:N,
+ 
+ dt{k} = treeRegress(Xtr,Ytr,'maxDepth',15,'minParent',8,'nFeatures',numRandFeatures);
+ curY = predict(dt{k}, Xtr);
+
+ %find validation MSE
+ prediction(:,k) = predict(dt{k}, Xvalid);
+ 
+end;
+
+predictY = mean(prediction,2);
+makeKagglePrediction(predictY);
 
 %%
 %NOTE: cross-validation did not make a difference with training and
