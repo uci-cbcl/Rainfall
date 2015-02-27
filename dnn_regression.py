@@ -65,7 +65,8 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
     
     costFunction = pylearn2.costs.mlp.Default()
     if dropout:
-        costFunction = pylearn2.costs.mlp.dropout.Dropout()
+        costFunction = pylearn2.costs.mlp.dropout.Dropout(default_input_include_prob=0.8,  default_input_scale=1/0.8,
+            input_include_probs={'h0':0.9}, input_scales={'h0':1/0.9})
 
     cost = pylearn2.costs.cost.SumOfCosts(costs=[costFunction])
 
