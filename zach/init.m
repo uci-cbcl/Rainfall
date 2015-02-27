@@ -34,37 +34,10 @@ Xte = X1te;
 
 %NOTE: cross-validation did not make a difference with training and
 %       validation error
-[Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
+[~,Xvalid,~,Yvalid] = splitData(Xtr,Ytr,0.8);
 
-[numData,numFeatures] = size(Xtrain);
-[numTestData,numFeats] = size(Xvalid);
-
-N = 40;
-dt = cell(1,N);
-mseTraining = zeros(1,N);
-mseValidation = zeros(1,N);
-
-predictY = 0;
-curY = 0;
-prediction = zeros(numTestData,N);
-numRandFeatures = 50;
-
-for k=1:N,
- 
- [xb,yb] = bootstrapData(Xtr,Ytr,numData);
- dt{k} = treeRegress(xb,yb,'maxDepth',15,'minParent',8,'nFeatures',numRandFeatures);
- curY = predict(dt{k}, xb);
- 
- %find training MSE at k
- mseTraining(k) = mean((curY-yb).^2);
- 
- %find validation MSE
- prediction(:,k) = predict(dt{k}, Xvalid);
- predictY = mean(prediction(:,1:k),2);
- 
- mseValidation(k) = mean((Yvalid-predictY).^2);
- 
-end;
+N = 20;
+[~,mseTraining,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N);
 
 plot(mseTraining,'r-');
 hold on
@@ -77,23 +50,8 @@ title('MSE versus Number of Learners for Gradient Boosting');
 %%
 
 %now learn on rest of data
-N = 35;
-dt = cell(1,N);
-curY = 0;
-[numTestData,numFeats] = size(Xte);
-prediction = zeros(numTestData,N);
-
-for k=1:N,
- 
- dt{k} = treeRegress(Xtr,Ytr,'maxDepth',15,'minParent',8,'nFeatures',numRandFeatures);
- curY = predict(dt{k}, Xtr);
-
- %find validation MSE
- prediction(:,k) = predict(dt{k}, Xte);
- 
-end;
-
-predictY = mean(prediction,2);
+[predictY,~,~] = ...
+    doRandomForests(Xtr,Xte,Ytr,0,N);
 makeKagglePrediction(predictY);
 
 %%
@@ -116,7 +74,7 @@ title('MSE versus Number of Learners for Gradient Boosting');
 %%
 
 %train on all the test data
-[~,mseTraining,mseValidation] = ...
+[predictY,~,~] = ...
     doGradientBoosting(Xtr,Xte,Ytr,0,100);
 
 makeKagglePrediction(predictY);
