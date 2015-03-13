@@ -1,5 +1,5 @@
 function [ predictY,mseTraining,mseValidation ] = ...
-    doRandomForests( Xtrain,Xvalid,Ytrain,Yvalid,N)
+    doRandomForests( Xtrain,Xvalid,Ytrain,Yvalid,N,numRandFeatures)
 %DOGRADIENTBOOSTING Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -12,7 +12,6 @@ mseValidation = zeros(1,N);
 
 predictY = 0;
 prediction = zeros(numTestData,N);
-numRandFeatures = 50;
 
 for k=1:N,
  

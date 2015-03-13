@@ -36,8 +36,25 @@ Xte = X1te;
 %       validation error
 [~,Xvalid,~,Yvalid] = splitData(Xtr,Ytr,0.8);
 
-N = 20;
-[~,mseTraining,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N);
+N = 15;
+numFeats = 50;
+
+%{
+validMSEs = zeros(1,6);
+numFeatValues = [20 30 40 50 60 70];
+for i = 1:6
+    numFeats = numFeatValues(i);
+    i
+    [~,~,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N,numFeats);
+    validMSEs(i) = min(mseValidation);
+end
+plot(numFeatValues,validMSEs);
+xlabel('Number of Feature Values');
+ylabel('Validation MSE');
+%}
+
+[~,mseTraining,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N,numFeats);
+
 
 plot(mseTraining,'r-');
 hold on
@@ -46,6 +63,7 @@ xlabel('Number of Learners in Ensemble');
 ylabel('Mean Squared Error');
 legend('Training Error','Validation Error');
 title('MSE versus Number of Learners for Gradient Boosting');
+
 
 %%
 
