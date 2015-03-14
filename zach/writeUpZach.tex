@@ -1,0 +1,75 @@
+%%
+%% Class homework & solution template for latex
+%% Alex Ihler
+%%
+\documentclass[twoside,11pt]{article}
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{graphicx,color}
+\usepackage{verbatim,url}
+\usepackage{listings}
+\usepackage{upquote}
+\usepackage[T1]{fontenc}
+%\usepackage{lmodern}
+\usepackage[scaled]{beramono}
+%\usepackage{textcomp}
+
+% Directories for other source files and images
+\newcommand{\bibtexdir}{../bib}
+\newcommand{\figdir}{fig}
+
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\matlab}{{\sc Matlab}\ }
+
+\setlength{\textheight}{9in} \setlength{\textwidth}{6.5in}
+\setlength{\oddsidemargin}{-.25in}  % Centers text.
+\setlength{\evensidemargin}{-.25in} %
+\setlength{\topmargin}{0in} %
+\setlength{\headheight}{0in} %
+\setlength{\headsep}{0in} %
+
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\renewcommand{\labelenumii}{(\arabic{enumii})}
+
+\theoremstyle{definition}
+\newtheorem{MatEx}{M{\scriptsize{ATLAB}} Usage Example}
+
+\definecolor{comments}{rgb}{0,.5,0}
+\definecolor{backgnd}{rgb}{.95,.95,.95}
+\definecolor{string}{rgb}{.2,.2,.2}
+\lstset{language=Matlab}
+\lstset{basicstyle=\small\ttfamily,
+        mathescape=true,
+        emptylines=1, showlines=true,
+        backgroundcolor=\color{backgnd},
+        commentstyle=\color{comments}\ttfamily, %\rmfamily,
+        stringstyle=\color{string}\ttfamily,
+        keywordstyle=\ttfamily, %\normalfont,
+        showstringspaces=false}
+\newcommand{\matp}{\mathbf{\gg}}
+
+\begin{document}
+
+\section*{Decision Tree Methods}
+
+For my part, I decided to test out different decision tree methods. I wanted to compare a single strong learners with multiple weak learners and see which works best for this data set. Additionally, I wanted to see which of the popular methods for ensembling weak learners achieved the best result. This involved not only trying Gradient Boosting and Random Forests, but combining them to see if that learner was quite strong.  
+
+\section*{Single Decision Tree} 
+
+In order to compare the ensemble methods, I wanted a baseline being one decision tree and seeing how much I could optimize the validation error for a single decision tree. 
+
+\section*{Gradient Boosting}
+
+
+
+\section*{Random Forests}
+
+
+
+\section*{Gradient Boosted Random Forests}
+
+I wanted to see if a combination of gradient boosting and random forests would work well. I selected a random set of features and then trained their decision trees using gradient boosting. I then averaged together the results. The idea was to use the randomness from random forests but boost each of the trees found. 
+
+
+\end{document}

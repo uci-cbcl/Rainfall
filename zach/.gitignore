@@ -2,3 +2,8 @@
 /kaggleData.mat
 /*.asv
 /kagglePrediction.csv
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf

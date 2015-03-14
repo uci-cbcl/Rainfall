@@ -28,6 +28,30 @@ Xte = [X1te meanX2te stdX2te];
 %Xte = [X1te X2te];
 
 %%
+%Call 2: Kaggle score was 0.64843, the best one
+%dt = treeRegress(Xtr,Ytr,'maxDepth',20,'minParent',2^9);
+[Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
+
+%see best value for maxDepth
+maxDepthVals = [15 20 25 30 35 40 45 50];
+numVals = size(maxDepthVals,2);
+validMSE = zeros(1,numVals);
+trainMSE = zeros(1,numVals);
+for val = 1:numVals
+    dt = treeRegress(Xtrain,Ytrain,'maxDepth',maxDepthVals(val),'minParent',2^9);
+    trainMSE(val) = mse(dt,Xtrain,Ytrain);
+    validMSE(val) = mse(dt,Xvalid,Yvalid);
+end
+
+plot(validMSE);
+[minVal,minIndex] = min(validMSE);
+bestDepthVal = maxDepthVals(minIndex);
+
+%%
+Yhat = predict(dt,Xte);
+makeKagglePrediction(Yhat);
+
+%%
 
 Xtr = X1tr;
 Xte = X1te;
