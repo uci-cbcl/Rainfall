@@ -111,7 +111,6 @@ makeKagglePrediction(predictY);
 [~,mseTraining,mseValidation] = ...
     doGradientBoosting(Xtrain,Xvalid,Ytrain,Yvalid,150);
 
-%%
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
@@ -124,6 +123,6 @@ title('MSE versus Number of Learners for Gradient Boosting');
 
 %train on all the test data
 [predictY,~,~] = ...
-    doGradientBoosting(Xtr,Xte,Ytr,0,100);
+    doGradientBoosting(Xtr,Xte,Ytr,0,150);
 
 makeKagglePrediction(predictY);

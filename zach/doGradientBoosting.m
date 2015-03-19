@@ -18,7 +18,7 @@ curY = 0;
 for k=1:N,
  
  grad = 2*(curY - Ytrain);
- dt{k} = treeRegress(Xtrain,grad,'maxDepth',maxTreeDepth);
+ dt{k} = treeRegress(Xtrain,grad,'maxDepth',maxTreeDepth,'minParent',512);
  curY = curY - alpha(k) * predict(dt{k}, Xtrain);
  
  %find training MSE at k

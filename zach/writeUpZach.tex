@@ -74,10 +74,11 @@ In the end, the best validation error occcured with minParent equal to 512 and t
 
 \section*{Gradient Boosting}
 
-\begin{figure}[h]
+For Gradient Boosting, the goal is to combine together weak decision trees by boosting each one based on the residual errors from the previous tree. In order to reduce the complexity of an individual tree, I set the maxDepth to 3 and the minParent to 512. I wanted to see how increasing the number of boosted learners affects the training and validation MSE. As it turns out, after about 50 learners, the training error does decrease but the validation error stays relatively constant. This suggests that even though it has started fitting to the data at that point, it is not very dramatic overfitting. After retraining on all the training data, using 150 boosted learners, and submitting the results to Kaggle, the MSE was 0.61388. Boosting weak learners did achieve better results than using a single very stong learner. \\
+\begin{figure}[h!]
 \centering
 \includegraphics[width=4 in]{numGradBoostsVersusMSE.png}
-\caption{MaxDepth Versus MSE}
+\caption{Gradient Boosting Versus MSE}
 \end{figure}
 
 \section*{Random Forests}
