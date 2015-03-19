@@ -83,11 +83,11 @@ For Gradient Boosting, the goal is to combine together weak decision trees by bo
 
 \section*{Random Forests}
 
-
+For random forests, we tried making each learner weak in that it only looks at a subset of the features. We then average together the results of each learner in an effort to boost performance. As it turns out, this fit the data the best. The hyperparameters we cared about were the number of learners used as well as the number of features selected randomly. 
 
 \section*{Gradient Boosted Random Forests}
 
-I wanted to see if a combination of gradient boosting and random forests would work well. I selected a random set of features and then trained their decision trees using gradient boosting. I then averaged together the results. The idea was to use the randomness from random forests but boost each of the trees found. 
+For this learner, I hypothesized that with Random Forests, I could have selected sets of features that worked particularly well. I thus decided to see if gradient boosting these particular learners and then ensembling the results would achieve good results. The idea is based on the hope that boosting the weak random feature learners would help their overall performance. 
 
 
 \end{document}
