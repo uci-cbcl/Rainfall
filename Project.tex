@@ -48,24 +48,24 @@ Learning curves for the neural network training clearly displays evidence of ove
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
 \begin{tabular}{cc}
-\includegraphics[width=.45\textwidth]{figdir/nn_mse_1.eps} &
-\includegraphics[width=.45\textwidth]{figdir/nn_mse_2.eps} \\
+\includegraphics[trim = 0mm 20mm 0mm 10mm, clip=true, width=.45\textwidth]{figdir/nn_mse_1.eps} &
+\includegraphics[trim = 0mm 20mm 0mm 10mm, clip=true, width=.45\textwidth]{figdir/nn_mse_2.eps} \\
 $N_{hidden}=1$ & $N_{hidden}=2$ \\
 Train MSE: $0.316$ & Train MSE: $0.303$ \\
 Validation MSE: $0.362$ & Validation MSE: $0.358$ \\
-\includegraphics[width=.45\textwidth]{figdir/nn_mse_3.eps} &
-\includegraphics[width=.45\textwidth]{figdir/nn_mse_5.eps} \\
+\includegraphics[trim = 0mm 20mm 0mm 10mm, clip=true, width=.45\textwidth]{figdir/nn_mse_3.eps} &
+\includegraphics[trim = 0mm 20mm 0mm 10mm, clip=true, width=.45\textwidth]{figdir/nn_mse_5.eps} \\
 $N_{hidden}=3$ & $N_{hidden}=5$ \\
 Train MSE: $0.297$ & Train MSE: $0.332$ \\
 Validation MSE: $0.361$ & Validation MSE: $0.365$ \\
 \end{tabular}
 \caption{Learning curves for neural network training showing the MSE (y-axis) on training data (blue) and validation data (green) as a function of the number of training samples processed (x-axis). Below each plot is the number of hidden layers in the neural network, and the training and validation MSE of the model yielding the lowest validation MSE during training.}
 \end{figure}
-\renewcommand{\baselinestretch}{1.5} %double space, safe for fancy headers
+\renewcommand{\baselinestretch}{1.1} %double space, safe for fancy headers
 
 \section{Discussion and conclusions}
 In this paper, we tuned and compared three different machine learning regression models and compared their performance on predicting rainfall amounts. Based on the performance on the test data, k-Nearest Neighbors performs the worst, while regression trees and neural networks achieve very similar performance. Future work can focus on improving performance on the individual models. For k-Nearest Neighbors, we can try weighing the k nearest neighbors differently instead of uniformly like we did in this paper. Based on the overfitting observed in the neural network training, we can explore how dropout improves performance. Applying momentum training, which adjusts the learning rate throughout training, is another option. Different ensemble strategies for regression trees, such as AdaBoost and Extra Trees, may also improve performance. Another avenue of future interest is to combine results from multiple models, including the 3 models considered in this paper, into an ensemble model.
 
 \section{Authors' contributions}
-All authors wrote the manuscript. ZD implemented regression trees. EF implemented k-Nearest Neighbors regression. DQ implemented neural networks. All authors read and approved the final manuscript.
+All authors wrote the manuscript. ZD implemented regression trees. EF implemented k-Nearest Neighbors. DQ implemented neural networks. All authors read and approved the final manuscript.
 \end{document}
