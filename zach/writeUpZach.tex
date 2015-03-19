@@ -53,11 +53,24 @@
 
 \section*{Decision Tree Methods}
 
-For my part, I decided to test out different decision tree methods. I wanted to compare a single strong learners with multiple weak learners and see which works best for this data set. Additionally, I wanted to see which of the popular methods for ensembling weak learners achieved the best result. This involved not only trying Gradient Boosting and Random Forests, but combining them to see if that learner was quite strong.  
+We wanted to compare different decision tree methods and see how they perform compared to the other methods. This involved seeing if a single strong learner or multiple weak learners would perform better for this data set. With the weak learners, we decided to see if Random Forests or Gradient Boosting achieved better results. We also wanted to see if boosting the random forests would help also.   
 
 \section*{Single Decision Tree} 
 
-In order to compare the ensemble methods, I wanted a baseline being one decision tree and seeing how much I could optimize the validation error for a single decision tree. 
+In order to compare the ensemble methods, I wanted a baseline being one decision tree and seeing how much I could optimize the validation error for a single decision tree. The important hyper-parameters for decision trees seem to be minParent and maxDepth. With minParent, it was clear that the ideal value for our data set was $2^9$ from the work we did in Homework 4. The validation error curve clearly showed that $2^9$ was the best value and it began to overfit after that. With maxDepth, the ideal value seemed to have been 15 but I wanted to see if a larger maxDepth would be better or cause the data to overfit. 
+\begin{figure}[h]
+\centering
+\includegraphics[width=4 in]{maxDepthVersusMSE.png}
+\caption{MaxDepth Versus MSE}
+\end{figure}
+As can be observed, once the maxDepth value reaches 20 or so, the training and validation error stays relatively the same. Since the minParent value was $512$, it is likely that after 20 layers, the decision tree does not have enough data in each node for meaningful splits. In order to verify this, I lowered the minParent value to $32$ to see if we will have the same effect as above, but after a greater number of layers. As it turns out, at 30 layers, the training error stops improving, hence a similar effect is observed. The validation error also stays relatively constant after 30 layers. When you look at the validation error though as a function of maxDepth, it is clear that there is overfitting after about 7 layers. Hence having a low minParent value not only causes more layers to occur but also increases overfitting.  \\
+\begin{figure}[h]
+\centering
+\includegraphics[width=4 in]{maxDepthVersusMSE2.png}
+\caption{MaxDepth Versus MSE}
+\end{figure}
+
+In the end, the best validation error occcured with minParent equal to 512 and the maxDepth equal to 20, so that is what I used when making the Kaggle data set. The Kaggle MSE ended up being 0.65003. 
 
 \section*{Gradient Boosting}
 

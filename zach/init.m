@@ -33,7 +33,7 @@ Xte = [X1te meanX2te stdX2te];
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
 
 %see best value for maxDepth
-maxDepthVals = [15 20 25 30 35 40 45 50];
+maxDepthVals = [1 2 5 7 10 12 15 20 22 25 27 30 32 35 37 40 42 45 47 50 52 55 57 60];
 numVals = size(maxDepthVals,2);
 validMSE = zeros(1,numVals);
 trainMSE = zeros(1,numVals);
@@ -42,12 +42,19 @@ for val = 1:numVals
     trainMSE(val) = mse(dt,Xtrain,Ytrain);
     validMSE(val) = mse(dt,Xvalid,Yvalid);
 end
-
-plot(validMSE);
+%%
+plot(maxDepthVals,validMSE,'g-');
+hold on
+plot(maxDepthVals,trainMSE,'r-');
+xlabel('Max Depth Value');
+ylabel('Mean Squared Error');
+legend('Validation MSE','Training MSE','Location','NorthWest');
 [minVal,minIndex] = min(validMSE);
 bestDepthVal = maxDepthVals(minIndex);
 
 %%
+
+dt = treeRegress(Xtr,Ytr,'maxDepth',20,'minParent',2^9);
 Yhat = predict(dt,Xte);
 makeKagglePrediction(Yhat);
 
