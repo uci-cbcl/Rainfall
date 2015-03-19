@@ -23,6 +23,7 @@ import pylearn2.monitor
 import pylearn2.train
 import pylearn2.models.mlp
 import pylearn2.training_algorithms.sgd
+import pylearn2.training_algorithms.bgd
 import pylearn2.termination_criteria
 import pylearn2.train_extensions.best_params
 import pylearn2.costs.cost
@@ -57,7 +58,16 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
         layers.append(hidden_layer(layer_name='h'+str(l), dim=num_hidden_nodes_per_layer,
         istdev=stdev))
 
-    layers.append(pylearn2.models.mlp.Linear(layer_name='y', dim=1, istdev=stdev))
+    if gaussian:
+        print 'Using Gaussian layer'
+        channelmonitor="valid_y_mse"
+        layers.append(pylearn2.models.mlp.LinearGaussian(layer_name='y', dim=1, irange=0.005, 
+            init_bias=0.6, 
+            init_beta=np.array([0.8]),
+            min_beta=0.5, max_beta=100., beta_lr_scale=1.))
+    else:
+        channelmonitor="train_objective"
+        layers.append(pylearn2.models.mlp.Linear(layer_name='y', dim=1, istdev=stdev))
 
     num_layers = len(layers)
     
@@ -65,15 +75,15 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
     
     costFunction = pylearn2.costs.mlp.Default()
     if dropout:
-        costFunction = pylearn2.costs.mlp.dropout.Dropout(default_input_include_prob=0.8,  default_input_scale=1/0.8,
+        costFunction = pylearn2.costs.mlp.dropout.Dropout(default_input_include_prob=0.5,  default_input_scale=1/0.5,
             input_include_probs={'h0':0.9}, input_scales={'h0':1/0.9})
 
     cost = pylearn2.costs.cost.SumOfCosts(costs=[costFunction])
 
-    criteria = [pylearn2.termination_criteria.MonitorBased(channel_name="valid_objective",
+    criteria = [pylearn2.termination_criteria.MonitorBased(channel_name=channelmonitor,
         prop_decrease=0., N=10),
-        pylearn2.termination_criteria.EpochCounter(max_epochs=10000)]
-    
+        pylearn2.termination_criteria.EpochCounter(max_epochs=122)]
+   
     algorithm = pylearn2.training_algorithms.sgd.SGD(batch_size=minibatch_size, 
         learning_rate=learning_rate,
         monitoring_dataset={'train':dataset_tr, 'valid':dataset_va},
@@ -82,7 +92,7 @@ def initialize_dnn(dataset_tr, dataset_va, output_dir, activation_function, num_
             criteria=criteria))
 
     extensions = [pylearn2.train_extensions.best_params.MonitorBasedSaveBest(
-        channel_name='valid_objective',
+        channel_name=channelmonitor,
         save_path=output_dir+ "NNModel_best.pkl")]
 
     trainer = pylearn2.train.Train(dataset=dataset_tr, model=model,
