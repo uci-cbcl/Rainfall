@@ -111,7 +111,7 @@ makeKagglePrediction(predictY);
 [~,mseTraining,mseValidation] = ...
     doGradientBoosting(Xtrain,Xvalid,Ytrain,Yvalid,150);
 
-
+%%
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
