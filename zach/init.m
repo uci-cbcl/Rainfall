@@ -95,7 +95,7 @@ legend('Training Error','Validation Error');
 
 %now learn on rest of data
 [predictY,~,~] = ...
-    doRandomForests(Xtr,Xte,Ytr,0,N);
+    doRandomForests(Xtr,Xte,Ytr,0,60,40);
 makeKagglePrediction(predictY);
 
 %%

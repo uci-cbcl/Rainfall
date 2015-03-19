@@ -91,7 +91,7 @@ For random forests, we tried making each learner weak in that it only looks at a
 \caption{Number of Random Features versus Validation MSE}
 \end{figure}
 
-Next I tested how many learners it takes to get a good validation MSE. As it turns out after about 60 learners, the model stops improving. The following graph shows this. Because we bootstrap the data, the training MSE shown is actually the training MSE for each individual learner. 
+Next I tested how many learners it takes to get a good validation MSE. As it turns out after about 60 learners, the model stops improving. The following graph shows this. Because we bootstrap the data, the training MSE shown is actually the training MSE for each individual learner. \\
 
 \begin{figure}[h!]
 \centering
@@ -99,9 +99,16 @@ Next I tested how many learners it takes to get a good validation MSE. As it tur
 \caption{Number of Learners versus MSE}
 \end{figure}
 
+After these tests, I ran random forests with 40 features and on 60 weak learners. The Kaggle MSE ended up being 0.60282. 
+
 \section*{Gradient Boosted Random Forests}
 
-For this learner, I hypothesized that with Random Forests, I could have selected sets of features that worked particularly well. I thus decided to see if gradient boosting these particular learners and then ensembling the results would achieve good results. The idea is based on the hope that boosting the weak random feature learners would help their overall performance. 
+Seeing the sawtooth pattern with the training error caused me to hypothesize that some of those sets of features are likely better than others. I thus decided to see if gradient boosting these particular learners and then ensembling the results would achieve good results. The idea is based on the hope that boosting the weak random feature learners would help their overall performance. \\
+\\
+I did the following procedure:\\
+1. Train decision trees on random sets of 40 features\\
+2. Take the 10 best sets of features and train boosted decision trees on them\\
+3. Ensemble the trees from step 2\\
 
 
 \end{document}
