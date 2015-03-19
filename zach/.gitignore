@@ -7,3 +7,4 @@
 *.blg
 *.log
 *.pdf
+/*.synctex.gz

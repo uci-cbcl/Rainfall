@@ -60,20 +60,14 @@ makeKagglePrediction(Yhat);
 
 %%
 
-Xtr = X1tr;
-Xte = X1te;
-
 %NOTE: cross-validation did not make a difference with training and
 %       validation error
 [~,Xvalid,~,Yvalid] = splitData(Xtr,Ytr,0.8);
-
-N = 15;
-numFeats = 50;
-
 %{
-validMSEs = zeros(1,6);
-numFeatValues = [20 30 40 50 60 70];
-for i = 1:6
+N = 10;
+numFeatValues = [1 5 10 15 20 40 50 60 70 80 90];
+validMSEs = zeros(1,length(numFeatValues));
+for i = 1:length(numFeatValues)
     numFeats = numFeatValues(i);
     i
     [~,~,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N,numFeats);
@@ -84,16 +78,17 @@ xlabel('Number of Feature Values');
 ylabel('Validation MSE');
 %}
 
+N=30;
+numFeats = 40;
 [~,mseTraining,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N,numFeats);
 
-
+%%
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
 xlabel('Number of Learners in Ensemble');
 ylabel('Mean Squared Error');
 legend('Training Error','Validation Error');
-title('MSE versus Number of Learners for Gradient Boosting');
 
 
 %%
