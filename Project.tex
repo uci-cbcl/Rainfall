@@ -1,7 +1,7 @@
 \documentclass[12pt] {article}
 \usepackage[margin=1in]{geometry} %one inch margins
 \usepackage{graphicx,color}
-\renewcommand{\baselinestretch}{1.5} %double space, safe for fancy headers
+\renewcommand{\baselinestretch}{1.3} %double space, safe for fancy headers
 \usepackage{pslatex} %Times font
 \usepackage{apacite} %apa citation style
 \bibliographystyle{apacite}
@@ -40,7 +40,7 @@ The backpropagation algorithm for neural network training was implemented in Pyl
 
 \section{Results}
 \subsection{SVR}
-We first investigated the performance of the SVR algorithm on predicting rainfall. Briefly, the SVR algorithm is an optimization algorithm that works by minimizing the error while maximizing the margin. It has two hyperparameters to tune: $C$, the penalty for error, and $\gamma$, the threshold for tolerated error. Before training, \textbf{X1} features are preprocessed by a Radial Basis Function Kernel, which we found to provide good performance. However, the SVR algorithm is very inefficient because its running time quadratically with the number of training samples. Therefore, we randomly selected 10000 training samples to train the model on, and set aside the remaining 50000 samples as validation set. Based on the learning curves (\textbf{Figure 1}), we set $C$ and $\gamma$ to 1.5 and 5e-9, respectively. Evaluating this final model on the test dataset, we achieved an MSE of 0.444.
+We first investigated the performance of the SVR algorithm on predicting rainfall. Briefly, the SVR algorithm is an optimization algorithm that works by minimizing the error while maximizing the margin. It has two hyperparameters to tune: $C$, the penalty for error, and $\gamma$, the threshold for tolerated error. Before training, \textbf{X1} features are preprocessed by a Radial Basis Function Kernel, which we found to provide good performance. However, the SVR algorithm is very inefficient because its running time quadratically with the number of training samples. Therefore, we randomly selected 10000 training samples to train the model on, and set aside the remaining 50000 samples as validation set. Based on the learning curves (\textbf{Figure 1}), we set $C$ and $\gamma$ to 1.3 and 5e-9, respectively. Evaluating this final model on the test dataset, we achieved an MSE of 0.444.
 
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
@@ -51,7 +51,7 @@ minParent=512 & minParent=32 \\
 \end{tabular}
 \caption{Learning curves for training a single decision tree showing the MSE (y-axis) on training data (red) and validation data (green) as a function of the max depth value (x-axis). Below each plot is the value minParent is fixed at.}
 \end{figure}
-\renewcommand{\baselinestretch}{1.5} %double space, safe for fancy headers
+\renewcommand{\baselinestretch}{1.3} %double space, safe for fancy headers
 
 
 \subsection{Regression Trees}
@@ -65,7 +65,7 @@ minParent=512 & minParent=32 \\
 \end{tabular}
 \caption{Learning curves for training a single decision tree showing the MSE (y-axis) on training data (red) and validation data (green) as a function of the max depth value (x-axis). Below each plot is the value minParent is fixed at.}
 \end{figure}
-\renewcommand{\baselinestretch}{1.5} %double space, safe for fancy headers
+\renewcommand{\baselinestretch}{1.3} %double space, safe for fancy headers
 Although a single decision tree can perform well, an ensemble of decision trees can provide significantly better performance. We combined two ensemble methods, Gradient Boosting and Random Forests, according to the following procedure:
 
 \begin{enumerate}
@@ -85,13 +85,13 @@ minParent=512 & minParent=32 \\
 \end{tabular}
 \caption{Learning curves for training a Gradient Boosted Random Forest. The left plot details gradient boosting and the right plot details the averaging of several models.}
 \end{figure}
-\renewcommand{\baselinestretch}{1.5} %double space, safe for fancy headers
+\renewcommand{\baselinestretch}{1.3} %double space, safe for fancy headers
 \subsection{Neural Network}
 We next trained a neural network to predict rainfall amounts. Briefly, neural networks are statistical learning algorithms inspired by biological neural networks in which interconnected ``neurons'' can compute values based only on the values of neighboring neurons. Deep learning is a branch of machine learning that explores the performance of stacking many hidden layers of neurons, through which multiple levels of abstraction can be inferred. This is advantageous for problems with many features because deep neural networks can infer the optimal set of features to use without any manual feature selection. Therefore, we trained neural networks on the full set of features, \textbf{X1} and \textbf{X2} (normalized to zero mean and unit variance). Neural networks have recently become more popular due to their state-of-the-art performances in machine learning problems such as image and speech recognition, the development of advanced deep learning techniques such as dropout and unsupervised pretraining, and the application of powerful parallelized graphical processing units.
 
 To study how deeper networks perform, we trained neural networks with between 1 and 5 hidden layers (data for model with 4 hidden layers not shown). Due to large number of parameters, neural networks have a tendency to overfit if trained for too many training steps or epochs. Therefore, we further split the training data into a training and validation set in a 9:1 ratio. Training is terminated if the validation MSE, which is evaluated at the end of each training epoch, fails to decrease after 10 training epochs. Each hidden layer contains 1000 hidden neurons and the learning rate is fixed at 0.001. Rectified linear units serve as the activation function for computing the values of the hidden neurons and the final output layer is a standard linear layer. All weights were initialized by randomly drawing from a Gaussian distribution with mean 0 and standard deviation 0.01. Weights were updated by stochastic gradient descent with a fixed minibatch size of 100.
 
-Learning curves for the neural network training clearly displays evidence of overfitting (\textbf{Figure 3}). Optimal performance on the validation was reached around 122 training epochs. Based on the performance on the validation set, we selected the neural network with 2 hidden layers as our ``best'' model. We retrained this neural network with the full training data for 122 epochs and evaluated. Because linear output layers are not strictly non-negative, we apply an additional preprocessing step of converting all negative predictions to 0 before evaluating the trained model on the testing set. Evaluating this model on the test data, we achieved an MSE of 0.364.
+Learning curves for the neural network training clearly displays evidence of overfitting (\textbf{Figure 4}). Optimal performance on the validation was reached around 122 training epochs. Based on the performance on the validation set, we selected the neural network with 2 hidden layers as our ``best'' model. We retrained this neural network with the full training data for 122 epochs and evaluated. Because linear output layers are not strictly non-negative, we apply an additional preprocessing step of converting all negative predictions to 0 before evaluating the trained model on the testing set. Evaluating this model on the test data, we achieved an MSE of 0.364.
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
 \begin{tabular}{cc}
@@ -108,7 +108,7 @@ Validation MSE: $0.361$ & Validation MSE: $0.365$ \\
 \end{tabular}
 \caption{Learning curves for neural network training showing the MSE (y-axis) on training data (blue) and validation data (green) as a function of the number of training samples processed (x-axis). Below each plot is the number of hidden layers in the neural network, and the training and validation MSE of the model yielding the lowest validation MSE during training.}
 \end{figure}
-\renewcommand{\baselinestretch}{1.5} %double space, safe for fancy headers
+\renewcommand{\baselinestretch}{1.3} %double space, safe for fancy headers
 
 \subsection{Summary of results on test data}
 \textbf{Table 1} summarizes the performance of the three models on the test dataset. We find that the neural network performs the best overall, while SVR performs the worst.
