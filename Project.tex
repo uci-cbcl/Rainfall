@@ -40,16 +40,16 @@ The backpropagation algorithm for neural network training was implemented in Pyl
 
 \section{Results}
 \subsection{SVR}
-We first investigated the performance of the SVR algorithm on predicting rainfall. Briefly, the SVR algorithm is an optimization algorithm that works by minimizing the error while maximizing the margin. It has two hyperparameters to tune: $C$, the penalty for error, and $\gamma$, the threshold for tolerated error. Before training, \textbf{X1} features are preprocessed by a Radial Basis Function Kernel, which we found to provide good performance. However, the SVR algorithm is very inefficient because its running time quadratically with the number of training samples. Therefore, we randomly selected 10000 training samples to train the model on, and set aside the remaining 50000 samples as validation set. Based on the learning curves (\textbf{Figure 1}), we set $C$ and $\gamma$ to 1.3 and 5e-9, respectively. Evaluating this final model on the test dataset, we achieved an MSE of 0.444.
+We first investigated the performance of the SVR algorithm on predicting rainfall. Briefly, the SVR algorithm is an optimization algorithm that works by minimizing the error while maximizing the margin. It has two hyperparameters to tune: $C$, the penalty for error, and $\gamma$, the threshold for tolerated error. Hyperparameter tuning was accomplished in a grid search fashion. Before training, \textbf{X1} features are preprocessed by a Radial Basis Function Kernel, which we found to provide good performance. However, the SVR algorithm is very inefficient because its running time quadratically with the number of training samples. Therefore, we randomly selected 10000 training samples to train the model on, and set aside the remaining 50000 samples as validation set. Based on the learning curves (\textbf{Figure 1}), we set $C$ and $\gamma$ to 1.3 and 5e-9, respectively. Evaluating this final model on the test dataset, we achieved an MSE of 0.444.
 
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
 \begin{tabular}{cc}
 \includegraphics[width=.45\textwidth]{figdir/svmgamma10000.eps} &
 \includegraphics[width=.45\textwidth]{figdir/svmc10000.eps} \\
-minParent=512 & minParent=32 \\
+$C=1.5$ & $\gamma=5e-9$ \\
 \end{tabular}
-\caption{Learning curves for training a single decision tree showing the MSE (y-axis) on training data (red) and validation data (green) as a function of the max depth value (x-axis). Below each plot is the value minParent is fixed at.}
+\caption{Learning curves for SVR showing the MSE (y-axis) on training data (red) and validation data (green) as a function of the hyperparameter $\gamma$ (left) or $C$ (right) (x-axis). Below each plot is the value of at which the other parameter is fixed.}
 \end{figure}
 \renewcommand{\baselinestretch}{1.3} %double space, safe for fancy headers
 
@@ -81,7 +81,6 @@ Although a single decision tree can perform well, an ensemble of decision trees 
 \begin{tabular}{cc}
 \includegraphics[width=.45\textwidth]{figdir/learnerNumVersusMSE.png} &
 \includegraphics[width=.45\textwidth]{figdir/numLearnersVersusMSE2.png} \\
-minParent=512 & minParent=32 \\
 \end{tabular}
 \caption{Learning curves for training a Gradient Boosted Random Forest. The left plot details gradient boosting and the right plot details the averaging of several models.}
 \end{figure}
