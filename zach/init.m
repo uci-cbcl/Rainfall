@@ -80,7 +80,7 @@ ylabel('Validation MSE');
 
 %%
 [Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
-N=30;
+N=100;
 numFeats = 40;
 [~,mseTraining,mseValidation] = doRandomForests(Xtrain,Xvalid,Ytrain,Yvalid,N,numFeats);
 
