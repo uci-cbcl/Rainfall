@@ -15,7 +15,7 @@ prediction = zeros(numTestData,N);
 
 for k=1:N,
  
- [xb,yb] = bootstrapData(Xtrain,Ytrain,numData);
+ [xb,yb] = bootstrapData(Xtrain,Ytrain,numData*0.8);
  dt{k} = treeRegress(xb,yb,'maxDepth',15,'minParent',8,'nFeatures',numRandFeatures);
  curY = predict(dt{k}, xb);
  

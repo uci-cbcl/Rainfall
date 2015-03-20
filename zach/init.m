@@ -62,27 +62,28 @@ makeKagglePrediction(Yhat);
 
 %NOTE: cross-validation did not make a difference with training and
 %       validation error
-[~,Xvalid,~,Yvalid] = splitData(Xtr,Ytr,0.8);
-%{
+[Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
+
 N = 10;
 numFeatValues = [1 5 10 15 20 40 50 60 70 80 90];
 validMSEs = zeros(1,length(numFeatValues));
 for i = 1:length(numFeatValues)
     numFeats = numFeatValues(i);
     i
-    [~,~,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N,numFeats);
+    [~,~,mseValidation] = doRandomForests(Xtrain,Xvalid,Ytrain,Yvalid,N,numFeats);
     validMSEs(i) = min(mseValidation);
 end
 plot(numFeatValues,validMSEs);
 xlabel('Number of Feature Values');
 ylabel('Validation MSE');
-%}
 
-N=30;
-numFeats = 40;
-[~,mseTraining,mseValidation] = doRandomForests(Xtr,Xvalid,Ytr,Yvalid,N,numFeats);
 
 %%
+[Xtrain,Xvalid,Ytrain,Yvalid] = splitData(Xtr,Ytr,0.8);
+N=30;
+numFeats = 40;
+[~,mseTraining,mseValidation] = doRandomForests(Xtrain,Xvalid,Ytrain,Yvalid,N,numFeats);
+
 plot(mseTraining,'r-');
 hold on
 plot(mseValidation,'g--');
