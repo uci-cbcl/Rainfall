@@ -17,7 +17,7 @@
 \fancyhead[r,ro]{\thepage} %right top header
 \begin{document}
 \title{A comparison of three machine learning algorithms for predicting rainfall amount}
-\author{Zachary DeStefano, Elmira Forouzmand, and Daniel Quang}
+\author{Zachary DeStefano (zdestefa), Elmira Forouzmand (forouzme), Daniel Quang (daquang)}
 \date \today
 \maketitle
 \thispagestyle{empty}
@@ -26,21 +26,18 @@
 \pagebreak
 \setcounter{page}{1}
 \section{Introduction}
-Regression is a common problem in the field of machine learning. It can be formulated as follows: Given some training data $D$, a set of $n$ points of the form $D=\{(\mathbf{x}_i,y_i) | \mathbf{x}_i \in \mathbb{R}^p, y_i \in \mathbb{R} \}$, find a prediction function $f$ that minimizes the error function. One additional constraint commonly encountered in regression problems is the requirement that all labels $y_i$ are non-negative. Typically, the error function is the mean-squared error (MSE): 
-$$\frac{1}{n}\sum_{i=1}^n\left(f(\mathbf{x}_i)-y_i\right)^2$$
-We explore three different machine learning algorithms: regression trees, Support Vector Regression (SVR), and neural networks, and compare their performance on predicting the amount of rainfall at a given location, using remote sensing (satellite) and numerical model data. 
+We decided to explore three different machine learning algorithms: regression trees, Support Vector Regression (SVR), and neural networks, and compare their performance on predicting the amount of rainfall at a given location, using remote sensing (satellite) and numerical model data. Because this is a regression problem, we decided to use Mean Squared Error (MSE) as our error function for judging the performance of our algorithms. 
 \section{Materials and Methods}
 \subsection{Data}
 Training and testing data were downloaded from the in-class Kaggle competition, \textbf{How's the weather?}. The training dataset includes 60000 samples and the testing dataset includes 40000 samples. Labels are only available for training data, corresponding to non-negative rainfall amounts at various locations. Features are split into two sets: \textbf{X1} and \textbf{X2}. \textbf{X1} is a set of 91 primary features, and \textbf{X2} is a set of 441 features derived from raw IR3 local image patches.   
 
 \subsection{Implementation}
-The SVR algorithm was implemented in Python with the relevant modules from scikit-learn, an open source machine learning library. The regression trees algorithm was implemented in MATLAB using the class provided source codes.
+The SVR algorithm was implemented in Python with the relevant modules from scikit-learn, an open source machine learning library. The regression trees algorithm was implemented in MATLAB and used the treeRegress class provided from the class source code to make the decision trees. 
 
-The backpropagation algorithm for neural network training was implemented in Pylearn2, a machine learning Python library. Pylearn2 is built on top of Theano, another Python library that optimizes and stabilizes mathematical expressions and then compiles them to a GPU backend. The Pylearn2 Python codes were tested on Ubuntu Linux 14.04 with GCC 4.8.2, NVCC 6.5.12, and Python 2.7.9. Computations were performed using a machine with 6 Intel Xeon cores, an NVIDIA Titan Z graphics processor, and 64 GB memory.
-
+The backpropagation algorithm for neural network training was implemented in Pylearn2, a machine learning Python library. Pylearn2 is built on top of Theano, another Python library that optimizes and stabilizes mathematical expressions and then compiles them to a GPU backend. 
 \section{Results}
 \subsection{SVR}
-We first investigated the performance of the SVR algorithm. Briefly, the SVR algorithm is an optimization algorithm that works by minimizing the error while maximizing the margin. It has two hyperparameters to tune: $C$, the penalty for error, and $\gamma$, the threshold for tolerated error. Hyperparameter tuning was accomplished in a grid search fashion. Before training, \textbf{X1} and \textbf{X2} features are preprocessed by a Radial Basis Function Kernel. However, the SVR algorithm is generally very inefficient because its running time grows quadratically with the number of training samples. Therefore, we randomly selected 10000 training samples to train the model on, which we further split into a training and validation set in an 8:2 ratio. Based on the learning curves (\textbf{Figure 1}), we set $C$ and $\gamma$ to 1.2 and 5e-9, respectively. Evaluating this final model on the test dataset, we achieved an MSE of 0.444.
+We first investigated the performance of the SVR algorithm. It is an optimization algorithm that works by minimizing the error while maximizing the margin. It has two hyperparameters to tune: $C$, the penalty for error, and $\gamma$, the threshold for tolerated error. Hyperparameter tuning was accomplished in a grid search fashion. Before training, \textbf{X1} and \textbf{X2} features are preprocessed by a Radial Basis Function Kernel which performed efficiently. However, the SVR algorithm is generally very inefficient because its running time grows quadratically with the number of training samples. Therefore, we randomly selected 10000 training samples to train the model on, which we further split into a training and validation set in an 8:2 ratio. Based on the learning curves (\textbf{Figure 1}), we set $C$ and $\gamma$ to 1.2 and 5e-9, respectively. Evaluating this final model on the test dataset, we achieved an MSE of 0.444.
 
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
@@ -55,7 +52,9 @@ $C=1.5$ & $\gamma=5e-9$ \\
 
 
 \subsection{Regression Trees}
-Regression trees, or decision trees, can capture non-linear relationships among features and naturally output non-negative values. To develop our tree model, we first tune the hyperparameters, minParent and maxDepth, of a single decision tree (\textbf{Figure 2}) by evaluating its performance on 20\% of the training data we set aside as a validation set. The features include \textbf{X1} and the mean and standard deviation of the image patch features in \textbf{X2}. We find that setting the max depth and minParent to 20 and 512, respectively, provides optimal performance on the validation set.
+Regression trees, or decision trees, can capture non-linear relationships among features and naturally output non-negative values. To develop our tree model, we first tune the hyperparameters, minParent and maxDepth, of a single decision tree (\textbf{Figure 2}) by evaluating its performance on 20\% of the training data we set aside as a validation set. The features include \textbf{X1} and the mean and standard deviation of the image patch features in \textbf{X2}.
+
+In the work done in class, it was verified that the ideal value for minParent was 512. We verified the ideal value for maxDepth and found that once it reaches 20 (\textbf{Figure 2}), the training and validation error stay relatively constant. This is likely because after 20 layers, there is not enough data for more splits. To verify this, we lowered the minParent value to 32 and then tested the training and validation error with different maxDepth values. As it turns out, at 30 layers, the training error stops improving (\textbf{Figure 2}). Looking at the validation error as a function of maxDepth, it is clear that there is overfitting after about 7 layers. Hence having a low minParent value increases overfitting. In the end setting the max depth and minParent to 20 and 512, respectively, provides optimal performance on the validation set.
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
 \begin{tabular}{cc}
@@ -66,7 +65,10 @@ minParent=512 & minParent=32 \\
 \caption{Learning curves for training a single decision tree showing the MSE (y-axis) on training data (red) and validation data (green) as a function of the max depth value (x-axis). Below each plot is the value minParent is fixed at.}
 \end{figure}
 \renewcommand{\baselinestretch}{1.2} %double space, safe for fancy headers
-Although a single decision tree can perform well, an ensemble of decision trees can perform significantly better. We first investigate Random Forests, an ensemble method that averages outputs from decision trees trained on different feature subsets and random subsets of the training data (\textbf{Figure 3}). Our best Random Forest model (40 features and 60 weak learners) achieved an MSE of 0.363 on the test dataset. 
+
+Although a single decision tree can perform well, an ensemble of decision trees can perform significantly better. We first investigate Random Forests, an ensemble method that averages outputs from decision trees trained on different feature subsets and random subsets of the training data (\textbf{Figure 3}). As can be observed in the figure, to make this work well, it is necessary to train on a large number of the features, suggesting that many of the features together help determine the outcome. The individual predictions still seem weak, so we need to combine a good number of learners also. In the end, our best Random Forest model (40 features and 30 weak learners) achieved an MSE of 0.363 on the test dataset. 
+
+We did investigate another popular ensemble method, Gradient Boosting. We tested the number of gradient boosted learners versus MSE and found that the validation error stays relatively constant after 100 learners are used. The training error does decrease, however. This suggests that the additional trees do fit to the training data but do not affect the validation predictions. In the end though, Gradient Boosting with 100 boosted learners did not do as well as Random Forests and achieved an MSE of 0.376.
 
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
@@ -78,14 +80,14 @@ Although a single decision tree can perform well, an ensemble of decision trees 
 \end{figure}
 \renewcommand{\baselinestretch}{1.2} %double space, safe for fancy headers
 
-Next, we explored whether we can improve performance by combining Random Forests with Gradient Boosting, another ensemble method, according to the following procedure:
+Next, we explored whether we can improve performance by combining Random Forests with Gradient Boosting according to the following procedure:
 \begin{enumerate}
 \item Train decision trees on random sets of 40 features
 \item Take the 30 best sets of features and train boosted decision trees on them
 \item Ensemble the trees from step 2
 \end{enumerate}
 
-\textbf{Figure 4} shows the learning curves for training the Gradient Boosted Random Forest. The ``best'' hyperparameters were selected and the model was retrained on the entire training dataset. This final model achieved an MSE of 0.378 on the test data, which is not an improvement on our Random Forest model.
+\textbf{Figure 4} shows the learning curves for training the Gradient Boosted Random Forest. The ``best'' hyperparameters were selected and the model was retrained on the entire training dataset. This final model achieved an MSE of 0.378 on the test data, which is not an improvement on our Random Forest model. This could suggest that boosting the trees based on the training data does not work well for this case and efforts should instead be focused on making more detailed decision trees and averaging their results. 
 
 \renewcommand{\baselinestretch}{1.0} %double space, safe for fancy headers
 \begin{figure}[h!] \centering
@@ -97,7 +99,7 @@ Next, we explored whether we can improve performance by combining Random Forests
 \end{figure}
 \renewcommand{\baselinestretch}{1.2} %double space, safe for fancy headers
 \subsection{Neural Network}
-We next trained a neural network to predict rainfall amounts. Briefly, neural networks are statistical learning algorithms inspired by biological neural networks in which interconnected ``neurons'' can compute values based only on the values of neighboring neurons. Deep learning is a branch of machine learning that explores the performance of stacking many hidden layers of neurons, through which multiple levels of abstraction can be inferred. This is advantageous for problems with many features because deep neural networks can infer the optimal set of features to use without any manual feature selection. Therefore, we trained neural networks on the full set of features, \textbf{X1} and \textbf{X2} (normalized to zero mean and unit variance). Neural networks have recently become more popular due to their state-of-the-art performances in machine learning problems such as image and speech recognition, the development of advanced deep learning techniques such as dropout and unsupervised pretraining, and the application of powerful parallelized graphical processing units.
+We next trained a neural network to predict rainfall amounts. This is advantageous for problems with many features because deep neural networks can infer the optimal set of features to use without any manual feature selection. Therefore, we trained neural networks on the full set of features, \textbf{X1} and \textbf{X2} (normalized to zero mean and unit variance).
 
 To study how deeper networks perform, we trained neural networks with between 1 and 5 hidden layers (data for model with 4 hidden layers not shown). Due to the large number of parameters, neural networks have a tendency to overfit if trained for too many training steps or epochs. Therefore, we further split the training data into a training and validation set in a 9:1 ratio. Training is terminated if the validation MSE, which is evaluated at the end of each training epoch, fails to decrease after 10 training epochs. Each hidden layer contains 1000 hidden neurons and the learning rate is fixed at 0.001. Rectified linear units serve as the activation function for computing the values of the hidden neurons and the final output layer is a standard linear layer. All weights were initialized by randomly drawing from a Gaussian distribution with mean 0 and standard deviation 0.01. Weights were updated by stochastic gradient descent with a fixed minibatch size of 100.
 
@@ -131,7 +133,7 @@ Test MSE & 0.444 & 0.363 & 0.364
 \caption{Summary of performance on testing data with three models.}
 \end{table}
 \section{Discussion and conclusions}
-In this paper, we tuned and compared three different machine learning regression models and compared their performance on predicting rainfall amounts. Based on the MSE on the test data, SVR performs the worst, while regression trees and neural networks achieve very similar performance. Future work can focus on improving the individual models. For SVR, one of the limiting factors was that we had to train on a subset of the data due to the long running time of the training algorithm. An obvious route to explore is to apply powerful GPU hardware to accelerate SVR training so that we can train an SVR model on the entire training dataset. Based on the overfitting observed in the neural network training, we can explore how dropout improves performance. Applying momentum training, which adjusts the learning rate throughout training, is another option. Different ensemble strategies for regression trees, such as AdaBoost and Extra Trees, may also improve performance. Another avenue of future interest is to combine results from multiple models, including the 3 models considered in this paper, into an ensemble model.
+In this paper, we tuned and compared three different machine learning regression models and compared their performance on predicting rainfall amounts. Based on the MSE on the test data, SVR performs the worst, while regression trees and neural networks achieve very similar performance. We hypothesize this is because the Radial Basis Function makes some strong assumptions about the features, while regression trees and neural networks make relatively fewer assumptions and can capture non-linear relationships among the features. Future work can focus on improving the individual models. For SVR, one of the limiting factors was that we had to train on a subset of the data due to the long running time of the training algorithm. An obvious route to explore is to apply powerful GPU hardware to accelerate SVR training so that we can train an SVR model on the entire training dataset. Based on the overfitting observed in the neural network training, we can explore how dropout improves performance. Applying momentum training, which adjusts the learning rate throughout training, is another option. Different ensemble strategies for regression trees, such as AdaBoost and Extra Trees, may also improve performance. Another avenue of future interest is to combine results from multiple models, including the 3 models considered in this paper, into an ensemble model.
 
 \section{Authors' contributions}
 All authors wrote the manuscript. ZD implemented regression trees. EF implemented SVR. DQ implemented neural networks. All authors read and approved the final manuscript.
